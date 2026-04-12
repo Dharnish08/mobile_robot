@@ -1,0 +1,16 @@
+build/ 
+install/
+log/
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd   
+
+# Gazebo
+*.bag
+*.db3
+
+# OS
+.DS_Store
+Thumbs.db
