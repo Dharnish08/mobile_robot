@@ -136,6 +136,7 @@
   </link>
 
   <!-- Fixed joint — caster doesn't move relative to base -->
+  <!-- Fixed joint — caster doesn't move relative to base -->
   <joint name="caster_joint" type="fixed">
     <parent link="base_link"/>
     <child  link="caster_wheel"/>
@@ -171,5 +172,85 @@
     <child  link="lidar_link"/>
     <origin xyz="0 0 ${base_height/2 + 0.03}" rpy="0 0 0"/>
   </joint>
+
+  <!-- ==================== GAZEBO PLUGINS ==================== -->
+
+  <!-- Differential Drive Plugin -->
+  <!-- This is what makes your robot actually move in simulation -->
+  <gazebo>
+    <plugin name="differential_drive_controller"
+            filename="libgazebo_ros_diff_drive.so">
+
+      <!-- Update rate in Hz -->
+      <update_rate>50</update_rate>
+
+      <!-- Wheel joints — must match your joint names exactly -->
+      <left_joint>left_wheel_joint</left_joint>
+      <right_joint>right_wheel_joint</right_joint>
+
+      <!-- Robot geometry — must match your URDF values -->
+      <wheel_separation>0.34</wheel_separation>  <!-- base_width + wheel_thickness -->
+      <wheel_diameter>0.16</wheel_diameter>       <!-- 2 * wheel_radius -->
+
+      <!-- Max wheel torque and acceleration -->
+      <max_wheel_torque>20</max_wheel_torque>
+      <max_wheel_acceleration>1.0</max_wheel_acceleration>
+
+      <!-- Topics this plugin reads and publishes -->
+      <command_topic>cmd_vel</command_topic>
+      <odometry_topic>odom</odometry_topic>
+      <odometry_frame>odom</odometry_frame>
+      <robot_base_frame>base_link</robot_base_frame>
+
+      <!-- Publish TF: odom → base_link -->
+      <publish_odom>true</publish_odom>
+      <publish_odom_tf>true</publish_odom_tf>
+      <publish_wheel_tf>false</publish_wheel_tf>
+
+    </plugin>
+  </gazebo>
+
+  <!-- LiDAR Ray Sensor Plugin -->
+  <!-- This makes your LiDAR actually fire laser rays and publish /scan -->
+  <gazebo reference="lidar_link">
+    <sensor type="ray" name="lidar_sensor">
+
+      <!-- Position of sensor within the link -->
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>true</visualize>  <!-- Show laser rays in Gazebo -->
+      <update_rate>10</update_rate>
+
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>360</samples>        <!-- 360 laser rays -->
+            <resolution>1</resolution>
+            <min_angle>-3.14159</min_angle>  <!-- Full 360° sweep -->
+            <max_angle>3.14159</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.12</min>    <!-- Minimum detection range -->
+          <max>10.0</max>    <!-- Maximum detection range -->
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>   <!-- Small realistic noise -->
+        </noise>
+      </ray>
+
+      <!-- ROS plugin that bridges sensor → /scan topic -->
+      <plugin name="lidar_plugin" filename="libgazebo_ros_ray_sensor.so">
+        <ros>
+          <remapping>~/out:=scan</remapping>
+        </ros>
+        <output_type>sensor_msgs/LaserScan</output_type>
+        <frame_name>lidar_link</frame_name>
+      </plugin>
+
+    </sensor>
+  </gazebo>
 
 </robot>
