@@ -138,10 +138,10 @@
   <!-- Fixed joint — caster doesn't move relative to base -->
   <!-- Fixed joint — caster doesn't move relative to base -->
   <joint name="caster_joint" type="fixed">
-    <parent link="base_link"/>
-    <child  link="caster_wheel"/>
-    <!-- Front of robot, floor level -->
-    <origin xyz="${base_length/2 - caster_radius} 0 ${-base_height/2}" rpy="0 0 0"/>
+      <parent link="base_link"/>
+      <child  link="caster_wheel"/>
+      <origin xyz="${base_length/2 - caster_radius} 0 
+          ${-base_height/2 - (wheel_radius - caster_radius)}" rpy="0 0 0"/>
   </joint>
 
   <!-- ==================== LIDAR ==================== -->
@@ -252,5 +252,9 @@
 
     </sensor>
   </gazebo>
-
+  <!-- Remove friction from caster so it slides freely -->
+  <gazebo reference="caster_wheel">
+    <mu1>0.0</mu1>
+    <mu2>0.0</mu2>
+  </gazebo>
 </robot>
