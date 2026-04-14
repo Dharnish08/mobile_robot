@@ -13,10 +13,13 @@ def generate_launch_description():
     # Process xacro → URDF string
     xacro_file = os.path.join(pkg_path, 'urdf', 'amr_bot.urdf.xacro')
     robot_description = xacro.process_file(xacro_file).toxml()
+    # Get world file path
+    world_file = os.path.join(pkg_path, 'worlds', 'room.world')
 
-    # Launch Gazebo with empty world
+
+    # Launch Gazebo with our room world
     gazebo = ExecuteProcess(
-        cmd=['gazebo', '--verbose', '-s', 'libgazebo_ros_factory.so'],
+        cmd=['gazebo', '--verbose', world_file, '-s', 'libgazebo_ros_factory.so'],
         output='screen'
     )
 
